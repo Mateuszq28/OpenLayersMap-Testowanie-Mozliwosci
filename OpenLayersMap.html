@@ -1,0 +1,95 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>OpenLayers Map</title>
+
+        <!-- The openlayers script -->
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <script type="text/javascript">
+            var lon = 18.64542;
+            var lat = 54.34766;
+            var zoom = 5;
+            var map;
+            var mercator = new OpenLayers.Projection("EPSG:900913");
+            var wgs84 = new OpenLayers.Projection("EPSG:4326"); 
+            var apiKey = "Ahs_XraPx_a1hHkXgimWXMtUJPx4C6pJeIKv9_8JHT1dTrYckVLJOJPS-tGa6TWN";
+            var options = { projection: mercator };
+			
+
+            function init(){
+                map = new OpenLayers.Map('map', options);
+                
+                var osm = new OpenLayers.Layer.OSM("Simple OSM Map");
+				
+
+				//zad 1
+				var bing_streets = new OpenLayers.Layer.Bing({name: "Bing StreetMap", type: "Road", key: apiKey});
+				var bing_sat = new OpenLayers.Layer.Bing({name: "Bing AerialMap", type: "Aerial", key: apiKey});
+				var bing_hyb = new OpenLayers.Layer.Bing({name: "Bing HybridMap", type: "AerialWithLabels", key: apiKey});
+                map.addLayers([osm, bing_streets, bing_sat, bing_hyb]);
+				
+				//zad 2
+				map.displayProjection = wgs84; //Musi być przed OpenLayers.Control.Mouse.Position
+				
+				//zad 2
+				map.addControl(new OpenLayers.Control.PanZoomBar());
+				map.addControl(new OpenLayers.Control.ScaleLine());
+				map.addControl(new OpenLayers.Control.OverviewMap());
+				map.addControl(new OpenLayers.Control.KeyboardDefaults());
+				map.addControl(new OpenLayers.Control.MousePosition());
+				map.addControl(new OpenLayers.Control.LayerSwitcher());
+				
+				//zad 2
+				map.setCenter(new OpenLayers.LonLat(18.64542, 54.34766).transform(wgs84, mercator), 15);
+				
+				
+				//zad 3
+				var linkWMS1 = "http://ksg.eti.pg.gda.pl/geoserver/gis/wms";
+				var linkWMS2 = "https://ahocevar.com/geoserver/wms";
+				//mapa hydrologiczna Polski ponizej
+				var linkWMS3 = "http://mapy.geoportal.gov.pl/wss/service/img/guest/HYDRO/MapServer/WMSServer";
+				//geoportal mapa hipsometryczna poniżej
+				var linkWMS4 = "https://mapy.geoportal.gov.pl/wss/service/PZGIK/NMT/GRID1/WMS/Hypsometry";
+				var linkWMS5 = "http://www.serverwms.pl/cgi-bin/pwz";
+						
+				var polprzezroczysta = new OpenLayers.Layer.WMS("WMS warstwa", linkWMS1, {layers: '2014_07_25_BalticCyano', transparent: true}, {isBaseLayser: false});
+				polprzezroczysta.setOpacity(0.5);
+				map.addLayer(polprzezroczysta);
+				
+				var polprzezroczysta2 = new OpenLayers.Layer.WMS("WMS warstwa 2 - Stany Zjednoczone", linkWMS2, {layers: "topp:states", transparent: true}, {isBaseLayer: false});
+				polprzezroczysta2.setOpacity(0.3);
+				map.addLayer(polprzezroczysta2);
+				
+				//var polprzezroczysta3 = new OpenLayers.Layer.WMS("WMS warstwa 3", linkWMS3, {layers: "topp:states", transparent: true}, {isBaseLayer: false});
+				//polprzezroczysta3.setOpacity(0.5);
+				//map.addLayer(polprzezroczysta3);
+			
+			
+				//zad 4
+				var vectors = new OpenLayers.Layer.Vector("ksztalty");
+				map.addLayer(vectors);
+				map.addControl(new OpenLayers.Control.EditingToolbar(vectors));
+				
+				//zad 5
+				var miasta = new OpenLayers.Layer.Markers("miasta");
+				map.addLayer(miasta);
+				var gdynia = new OpenLayers.LonLat(18.53166, 54.51888).transform(wgs84, mercator);
+				var warszawa = new OpenLayers.LonLat(21.01166, 52.22972).transform(wgs84, mercator);
+				var krakow = new OpenLayers.LonLat(19.93638, 50.06138).transform(wgs84, mercator);
+				var markGdynia = new OpenLayers.Marker(gdynia);
+				var markWarszawa = new OpenLayers.Marker(warszawa);
+				var markKrakow = new OpenLayers.Marker(krakow);
+				miasta.addMarker(markGdynia);
+				miasta.addMarker(markWarszawa);
+				miasta.addMarker(markKrakow);
+				
+			
+                map.zoomIn();
+				
+            }
+
+        </script>
+    </head>
+    <body onload="init()">
+            <div id="map"></div>
+    </body>
+</html>
